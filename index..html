@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SS3D — Anonymous Messages</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+:root{
+  --bg:#0a0a0f;
+  --card:#14141d;
+  --card2:#0f0f17;
+  --border:rgba(255,255,255,0.08);
+  --border2:rgba(255,255,255,0.14);
+  --text:#f5f5f7;
+  --muted:#9aa0a8;
+  --muted2:#5a5f68;
+  --accent:#a78bfa;
+  --radius:20px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:'Inter',system-ui,sans-serif;
+  min-height:100vh;
+  overflow-x:hidden;
+  position:relative;
+}
+.mono{font-family:'JetBrains Mono',monospace}
+.bg-orbs{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:0}
+.orb{position:absolute;border-radius:50%;filter:blur(90px);opacity:.35}
+.orb-1{width:520px;height:520px;background:radial-gradient(circle,#7c3aed,#4f46e5);top:-120px;left:-120px}
+.orb-2{width:640px;height:640px;background:radial-gradient(circle,#06b6d4,#6366f1);top:20%;right:-180px}
+.orb-3{width:480px;height:480px;background:radial-gradient(circle,#ec4899,#8b5cf6);bottom:-100px;left:30%}
+
+.container{max-width:1200px;margin:0 auto;padding:0 20px;position:relative;z-index:1}
+
+.header{position:sticky;top:0;z-index:10;backdrop-filter:blur(18px);background:rgba(10,10,15,0.7);border-bottom:1px solid var(--border)}
+.header-inner{display:flex;align-items:center;justify-content:space-between;height:64px}
+.logo{display:flex;align-items:center;gap:12px}
+.logo-mark{width:42px;height:42px;border-radius:12px;background:linear-gradient(135deg,#fff,#a78bfa);color:#000;display:flex;align-items:center;justify-content:center;font-weight:900;letter-spacing:-0.04em;font-size:15px}
+.logo-title{font-weight:900;letter-spacing:0.12em;font-size:13px;display:block}
+.logo-sub{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.18em;color:var(--muted2);display:block}
+.header-right{display:flex;align-items:center;gap:12px}
+.online-dot{display:flex;align-items:center;gap:8px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);background:rgba(255,255,255,0.04);border:1px solid var(--border);padding:7px 12px;border-radius:999px}
+.online-dot .dot{width:6px;height:6px;background:#10b981;border-radius:50%;box-shadow:0 0 10px #10b981;animation:pulse 1.8s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+
+.btn-ghost{height:32px;padding:0 14px;border-radius:999px;background:rgba(255,255,255,0.06);border:1px solid var(--border);color:var(--text);font-size:12px;font-weight:600;cursor:pointer}
+.btn-ghost:hover{background:rgba(255,255,255,0.1)}
+
+.main{padding:28px 20px 40px}
+.hero-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:28px;align-items:start}
+@media(max-width:900px){.hero-grid{grid-template-columns:1fr}}
+
+.badge{display:inline-flex;padding:6px 12px;border-radius:999px;background:rgba(167,139,250,0.12);border:1px solid rgba(167,139,250,0.22);font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.18em;color:#c4b5fd}
+h1{font-size:48px;line-height:0.95;letter-spacing:-0.04em;margin:18px 0 14px;font-weight:900}
+@media(max-width:600px){h1{font-size:36px}}
+.grad{background:linear-gradient(90deg,#a78bfa,#60a5fa,#34d399);-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero-desc{color:var(--muted);line-height:1.6;font-size:15px;max-width:520px}
+.stats{display:flex;gap:18px;margin:22px 0}
+.stat{display:flex;flex-direction:column;background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:14px;padding:12px 16px;min-width:90px}
+.stat-num{font-weight:900;font-size:20px}
+.stat-label{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.14em;color:var(--muted2);text-transform:uppercase;margin-top:2px}
+
+.search-wrap{position:relative;margin-top:8px;max-width:420px}
+.search-wrap input{width:100%;height:44px;border-radius:999px;background:rgba(255,255,255,0.04);border:1px solid var(--border);color:var(--text);padding:0 18px 0 38px;font-size:13px;outline:none}
+.search-wrap input:focus{border-color:var(--border2);background:rgba(255,255,255,0.06)}
+.search-icon{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--muted2)}
+
+.filter-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.filter{height:30px;padding:0 12px;border-radius:999px;background:rgba(255,255,255,0.04);border:1px solid var(--border);color:var(--muted);font-family:'JetBrains Mono',monospace;font-size:11px;cursor:pointer;text-transform:uppercase;letter-spacing:0.06em}
+.filter.active{background:#fff;color:#000;border-color:#fff;font-weight:700}
+
+.write-card{background:linear-gradient(180deg,rgba(255,255,255,0.06),rgba(255,255,255,0.02));border:1px solid var(--border2);border-radius:24px;padding:18px;box-shadow:0 20px 60px rgba(0,0,0,0.5);backdrop-filter:blur(20px);transition:.2s}
+.write-card:focus-within{border-color:rgba(167,139,250,0.4);box-shadow:0 0 0 4px rgba(167,139,250,0.12),0 20px 60px rgba(0,0,0,0.5)}
+.write-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.anon-preview{display:flex;align-items:center;gap:10px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted)}
+.avatar{width:28px;height:28px;border-radius:50%}
+.write-hint{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.14em;color:var(--muted2);text-transform:uppercase}
+.write-card textarea{width:100%;min-height:120px;resize:none;background:rgba(0,0,0,0.25);border:1px solid var(--border);border-radius:16px;padding:14px 16px;color:var(--text);font-size:14px;line-height:1.6;outline:none}
+.write-card textarea::placeholder{color:var(--muted2)}
+.moods{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}
+.mood-btn{height:32px;padding:0 12px;border-radius:999px;border:1px solid var(--border);background:rgba(255,255,255,0.03);color:var(--muted);font-size:12px;cursor:pointer;display:flex;align-items:center;gap:6px}
+.mood-btn.active{background:#fff;color:#000;border-color:#fff;font-weight:700}
+.char-row{display:flex;align-items:center;justify-content:space-between;margin-top:10px}
+#charCount{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted2)}
+.btn-primary{height:40px;padding:0 18px;border-radius:999px;background:#fff;color:#000;border:none;font-weight:800;font-size:13px;cursor:pointer;transition:.15s}
+.btn-primary:disabled{opacity:.35;cursor:not-allowed}
+.btn-primary:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 8px 20px rgba(255,255,255,0.15)}
+.btn-primary.full{width:100%;height:46px;font-size:14px}
+
+.feed-section{margin-top:40px}
+.feed-head{display:flex;align-items:baseline;gap:14px;margin-bottom:16px;flex-wrap:wrap}
+.feed-head h2{font-size:20px;font-weight:800;letter-spacing:-0.02em}
+.feed-hint{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted2)}
+.feed{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+@media(max-width:1000px){.feed{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:600px){.feed{grid-template-columns:1fr}}
+
+.card{background:linear-gradient(180deg,rgba(255,255,255,0.05),rgba(255,255,255,0.02));border:1px solid var(--border);border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:12px;animation:cardIn .4s ease;transition:.15s}
+.card:hover{border-color:var(--border2);transform:translateY(-2px)}
+@keyframes cardIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.card-top{display:flex;align-items:center;justify-content:space-between}
+.card-identity{display:flex;align-items:center;gap:10px}
+.card-avatar{width:30px;height:30px;border-radius:50%;flex-shrink:0}
+.card-anon{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted)}
+.card-time{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted2)}
+.mood-tag{font-size:11px;padding:4px 10px;border-radius:999px;border:1px solid var(--border);background:rgba(255,255,255,0.04);display:inline-flex;align-items:center;gap:6px;width:fit-content}
+.card-text{font-size:14px;line-height:1.6;color:#e8e8ec;white-space:pre-wrap;word-break:break-word}
+.card-actions{display:flex;align-items:center;gap:8px;margin-top:2px}
+.action{height:28px;padding:0 10px;border-radius:999px;background:rgba(255,255,255,0.04);border:1px solid var(--border);color:var(--muted);font-size:12px;cursor:pointer;display:flex;align-items:center;gap:6px}
+.action.liked{background:rgba(244,63,94,0.15);border-color:rgba(244,63,94,0.3);color:#fb7185}
+.action:hover{background:rgba(255,255,255,0.08)}
+
+.end-marker{margin:26px auto 0;text-align:center;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted2);letter-spacing:0.12em;background:rgba(255,255,255,0.03);border:1px solid var(--border);display:block;width:fit-content;padding:8px 16px;border-radius:999px}
+
+.footer{display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;padding:18px 20px;border-top:1px solid var(--border);font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.16em;color:var(--muted2);text-transform:uppercase;position:relative;z-index:1;max-width:1200px;margin:0 auto}
+
+.toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%) translateY(20px);background:#fff;color:#000;padding:10px 18px;border-radius:999px;font-size:13px;font-weight:600;opacity:0;pointer-events:none;transition:.35s;z-index:50;box-shadow:0 10px 30px rgba(0,0,0,0.5)}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+.modal{position:fixed;inset:0;z-index:100;display:flex;align-items:center;justify-content:center;padding:16px}
+.modal.hidden{display:none}
+.modal-bg{position:absolute;inset:0;background:rgba(0,0,0,0.7);backdrop-filter:blur(8px)}
+.modal-card{position:relative;width:100%;max-width:560px;background:#13131a;border:1px solid var(--border2);border-radius:24px;padding:22px;box-shadow:0 30px 80px rgba(0,0,0,0.8)}
+.modal-top{display:flex;justify-content:space-between;align-items:start}
+.mono-label{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.2em;color:var(--muted2)}
+.modal-card h3{font-size:22px;font-weight:800;margin-top:6px}
+.close-btn{width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,0.08);border:1px solid var(--border);color:var(--text);cursor:pointer}
+.steps{margin:18px 0 16px;padding-left:18px;display:flex;flex-direction:column;gap:10px;font-size:13px;color:var(--muted);line-height:1.5}
+.steps code{background:rgba(255,255,255,0.08);padding:2px 6px;border-radius:6px;font-family:'JetBrains Mono',monospace;font-size:11px;color:#e8e8ec}
+.code-note{background:#0a0a0f;border:1px solid var(--border);border-radius:14px;padding:12px;margin-bottom:16px}
+.code-title{font-family:'JetBrains Mono',monospace;font-size:11px;color:#e8e8ec;font-weight:600;margin-bottom:8px}
+.code-note pre{font-family:'JetBrains Mono',monospace;font-size:11px;color:#7a808a;white-space:pre-wrap;line-height:1.6}
+    </style>
+</head>
+<body>
+
+    <div class="bg-orbs">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="orb orb-3"></div>
+    </div>
+
+    <!-- HEADER -->
+    <header class="header">
+        <div class="container header-inner">
+            <div class="logo">
+                <div class="logo-mark">SS3D</div>
+                <div class="logo-text">
+                    <span class="logo-title">ANONYMOUS</span>
+                    <span class="logo-sub">MESSAGES • FOREVER</span>
+                </div>
+            </div>
+            <div class="header-right">
+                <div class="online-dot">
+                    <span class="dot"></span>
+                    <span id="onlineCount">184</span> anon online
+                </div>
+                <button class="btn-ghost" id="infoBtn">Instruction</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- HERO + WRITE -->
+    <main class="container main">
+        <section class="hero-grid">
+            <!-- Left: intro -->
+            <div class="hero-copy">
+                <div class="badge">PURE HTML / CSS / JS — GITHUB READY</div>
+                <h1>Say it without saying <span class="grad">who you are.</span></h1>
+                <p class="hero-desc">
+                    Anonymous messages stored forever. No names. No logs.
+                    No accounts. Just whispers from the SS3D community that live on.
+                </p>
+                <div class="stats">
+                    <div class="stat">
+                        <span class="stat-num" id="totalMessages">0</span>
+                        <span class="stat-label">whispers</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-num" id="totalLikes">0</span>
+                        <span class="stat-label">hearts</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-num">∞</span>
+                        <span class="stat-label">forever</span>
+                    </div>
+                </div>
+                <div class="search-wrap">
+                    <input type="text" id="searchInput" placeholder="Search whispers, mood, anon ID..." />
+                    <span class="search-icon">⌕</span>
+                </div>
+                <div class="filter-row" id="filterRow">
+                    <button data-mood="all" class="filter active">All</button>
+                </div>
+            </div>
+
+            <!-- Right: write box -->
+            <div class="write-card" id="writeCard">
+                <div class="write-head">
+                    <div class="anon-preview">
+                        <div class="avatar" id="previewAvatar"></div>
+                        <span id="previewId">anon#????</span>
+                    </div>
+                    <span class="write-hint">100% anonymous</span>
+                </div>
+                <textarea id="messageInput" maxlength="500" placeholder="What's on your mind? It's 100% anonymous..."></textarea>
+                <div class="write-foot">
+                    <div class="moods" id="moodSelector"></div>
+                    <div class="char-row">
+                        <span id="charCount">0 / 500</span>
+                        <button id="postBtn" class="btn-primary">Post Anonymously →</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- FEED -->
+        <section class="feed-section">
+            <div class="feed-head">
+                <h2>Live feed</h2>
+                <span class="feed-hint">Newest first • stored in this browser forever</span>
+            </div>
+            <div class="feed" id="feed"></div>
+            <div class="end-marker">— end of whispers — for now</div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <span>Built for SS3D • By Toluene • 100% Anonymous</span>
+        <span class="footer-right">no cookies • no tracking • pure html/css/js</span>
+    </footer>
+
+    <!-- TOAST -->
+    <div id="toast" class="toast"></div>
+
+    <!-- MODAL -->
+    <div id="infoModal" class="modal hidden">
+        <div class="modal-bg" id="modalBg"></div>
+        <div class="modal-card">
+            <div class="modal-top">
+                <div>
+                    <div class="mono-label">INSTRUCTION</div>
+                    <h3>Send ANONYMOUS messages without your name</h3>
+                </div>
+                <button id="closeModal" class="close-btn">✕</button>
+            </div>
+            <ol class="steps">
+                <li><b>1. Open the message box</b> — Enter the anonymous message you want to send</li>
+                <li><b>2. Don't enter your name</b> — Your name is not required. You can send the message completely anonymously</li>
+                <li><b>3. Write your message</b> — Type anything you want to say, such as a compliment, confession, question, advice, or secret</li>
+                <li><b>4. Send anonymously</b> — Click <code>Post Anonymously</code> and your message will be submitted without displaying your name</li>
+                <li><b>5. Read messages</b> — The receiver can view the messages they receive, but the sender's name is not shown</li>
+            </ol>
+            <button class="btn-primary full" id="gotIt">Got it</button>
+        </div>
+    </div>
+
+<script>
+/* SS3D Anonymous Messages - Pure JS, localStorage forever */
+const MOODS = [
+  { id: "confession", emoji: "😶", label: "Confession" },
+  { id: "funny", emoji: "😂", label: "Funny" },
+  { id: "heartbreak", emoji: "💔", label: "Heartbreak" },
+  { id: "secret", emoji: "🤫", label: "Secret" },
+  { id: "idea", emoji: "💡", label: "Idea" },
+  { id: "rant", emoji: "😡", label: "Rant" },
+  { id: "crush", emoji: "😍", label: "Crush" },
+  { id: "school", emoji: "📚", label: "School" }
+];
+
+const GRADIENTS = [
+  "linear-gradient(135deg,#8b5cf6,#ec4899)",
+  "linear-gradient(135deg,#06b6d4,#6366f1)",
+  "linear-gradient(135deg,#10b981,#06b6d4)",
+  "linear-gradient(135deg,#f59e0b,#ec4899)",
+  "linear-gradient(135deg,#84cc16,#10b981)",
+  "linear-gradient(135deg,#3b82f6,#8b5cf6)",
+  "linear-gradient(135deg,#f43f5e,#8b5cf6)",
+  "linear-gradient(135deg,#fbbf24,#f97316)"
+];
+
+const STORAGE_KEY = "ss3d_messages_v1";
+const LIKED_KEY = "ss3d_liked_v1";
+
+const SEED = [
+  { id: "m1", text: "I have liked you since SS1 and you still don't know 😭. Every time you enter the classroom I suddenly forget how to behave normally.", mood: "crush", timestamp: Date.now() - 12 * 60 * 1000, likes: 42, anonId: "anon#4821", gradient: 0 },
+  { id: "m2", text: "That one friend who says 'I didn't read anything' before an exam and then comes out with 87%. Please explain yourself.", mood: "funny", timestamp: Date.now() - 2 * 60 * 60 * 1000, likes: 58, anonId: "anon#7392", gradient: 1 },
+  { id: "m3", text: "I still remember when we used to sit together during break time. School ended but honestly, I miss those random conversations.", mood: "heartbreak", timestamp: Date.now() - 5 * 60 * 60 * 1000, likes: 35, anonId: "anon#1044", gradient: 2 },
+  { id: "m4", text: "Our mathematics teacher said 'this question is very easy' and proceeded to write something that looked like a NASA equation on the board 😭.", mood: "rant", timestamp: Date.now() - 9 * 60 * 60 * 1000, likes: 71, anonId: "anon#5519", gradient: 3 },
+  { id: "m5", text: "Confession: I have pretended to understand the lesson at least 20 times this term. When the teacher asks 'Are you following?' I just nod.", mood: "confession", timestamp: Date.now() - 14 * 60 * 60 * 1000, likes: 49, anonId: "anon#2231", gradient: 4 },
+  { id: "m6", text: "Whoever keeps taking my seat before I arrive in the morning, this is your final warning. That chair has been mine since SS1 😭.", mood: "rant", timestamp: Date.now() - 22 * 60 * 60 * 1000, likes: 26, anonId: "anon#9920", gradient: 5 },
+  { id: "m7", text: "I studied for the exam all night and the first question was from the ONE topic I skipped. Education is actually personal sometimes.", mood: "school", timestamp: Date.now() - 26 * 60 * 60 * 1000, likes: 64, anonId: "anon#3174", gradient: 0 },
+  { id: "m8", text: "There is a girl in my class who smiles every time I walk past her. I don't know if she likes me or if I'm just imagining things 😭.", mood: "crush", timestamp: Date.now() - 30 * 60 * 60 * 1000, likes: 82, anonId: "anon#6081", gradient: 1 },
+  { id: "m9", text: "Our class group chat becomes completely active the night before an assignment is due. Suddenly everybody is asking for answers 😂.", mood: "funny", timestamp: Date.now() - 34 * 60 * 60 * 1000, likes: 55, anonId: "anon#4417", gradient: 2 },
+  { id: "m10", text: "I miss my old classmates. We used to complain about school every single day, but now that we're leaving, I actually don't want it to end.", mood: "heartbreak", timestamp: Date.now() - 40 * 60 * 60 * 1000, likes: 91, anonId: "anon#8250", gradient: 3 },
+  { id: "m11", text: "POV: The teacher says 'submit your assignment' and you suddenly remember you were supposed to do an assignment 😭.", mood: "funny", timestamp: Date.now() - 44 * 60 * 60 * 1000, likes: 73, anonId: "anon#1936", gradient: 4 },
+  { id: "m12", text: "I secretly think our class prefect is actually nice. Everyone complains about them but they helped me when I was having a bad day.", mood: "secret", timestamp: Date.now() - 50 * 60 * 60 * 1000, likes: 38, anonId: "anon#7542", gradient: 5 }
+];
+
+let messages = [];
+let liked = new Set();
+let filterMood = "all";
+let searchQ = "";
+let currentMood = "secret";
+
+const $ = (s) => document.querySelector(s);
+const feedEl = $("#feed");
+const moodSel = $("#moodSelector");
+const filterRow = $("#filterRow");
+const msgInput = $("#messageInput");
+const charCount = $("#charCount");
+const postBtn = $("#postBtn");
+const searchInput = $("#searchInput");
+
+function timeAgo(ts) {
+  const s = Math.floor((Date.now() - ts) / 1000);
+  if (s < 60) return `${s}s ago`;
+  const m = Math.floor(s / 60);
+  if (m < 60) return `${m}m ago`;
+  const h = Math.floor(m / 60);
+  if (h < 24) return `${h}h ago`;
+  const d = Math.floor(h / 24);
+  return `${d}d ago`;
+}
+
+function load() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) {
+      const p = JSON.parse(raw);
+      if (Array.isArray(p) && p.length > 0) messages = p;
+      else messages = [...SEED];
+    } else {
+      messages = [...SEED];
+    }
+    const likedRaw = localStorage.getItem(LIKED_KEY);
+    if (likedRaw) {
+      const parsedLiked = JSON.parse(likedRaw);
+      if (Array.isArray(parsedLiked)) liked = new Set(parsedLiked);
+    }
+  } catch (error) {
+    console.error("Could not load saved messages:", error);
+    messages = [...SEED];
+    liked = new Set();
+  }
+}
+
+function save() {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(messages));
+    localStorage.setItem(LIKED_KEY, JSON.stringify([...liked]));
+  } catch (error) {
+    console.error("Could not save messages:", error);
+  }
+}
+
+function renderMoods() {
+  moodSel.innerHTML = MOODS.map((m) => {
+    const active = m.id === currentMood ? "active" : "";
+    return `<button data-mood="${m.id}" class="mood-btn ${active}"><span>${m.emoji}</span>${m.label}</button>`;
+  }).join("");
+  moodSel.querySelectorAll(".mood-btn").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      currentMood = btn.dataset.mood;
+      renderMoods();
+    });
+  });
+}
+
+function renderFilters() {
+  const allBtn = `<button data-mood="all" class="filter ${filterMood === "all" ? "active" : ""}">All</button>`;
+  const others = MOODS.map((m) => {
+    const active = m.id === filterMood ? "active" : "";
+    return `<button data-mood="${m.id}" class="filter ${active}">${m.emoji} ${m.label}</button>`;
+  }).join("");
+  filterRow.innerHTML = allBtn + others;
+  filterRow.querySelectorAll(".filter").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      filterMood = btn.dataset.mood;
+      renderFilters();
+      renderFeed();
+    });
+  });
+}
+
+function filtered() {
+  return messages.filter((m) => {
+    const moodOk = filterMood === "all" || m.mood === filterMood;
+    if (!moodOk) return false;
+    if (!searchQ.trim()) return true;
+    const q = searchQ.toLowerCase();
+    return m.text.toLowerCase().includes(q) || m.mood.toLowerCase().includes(q) || m.anonId.toLowerCase().includes(q);
+  }).sort((a, b) => b.timestamp - a.timestamp);
+}
+
+function renderFeed() {
+  const list = filtered();
+  $("#totalMessages").textContent = messages.length;
+  $("#totalLikes").textContent = messages.reduce((a, b) => a + b.likes, 0);
+  if (list.length === 0) {
+    feedEl.innerHTML = `<div class="card" style="grid-column:1/-1;text-align:center;padding:32px;color:#777">No whispers found. Try another mood or search.</div>`;
+    return;
+  }
+  feedEl.innerHTML = list.map((m) => {
+    const moodObj = MOODS.find((x) => x.id === m.mood) || MOODS[0];
+    const grad = GRADIENTS[m.gradient % GRADIENTS.length];
+    const isLiked = liked.has(m.id);
+    return `
+      <div class="card" id="${m.id}">
+        <div class="card-top">
+          <div class="card-identity">
+            <div class="card-avatar" style="background:${grad}"></div>
+            <span class="card-anon">${escapeHtml(m.anonId)}</span>
+          </div>
+          <span class="card-time">${timeAgo(m.timestamp)}</span>
+        </div>
+        <div class="mood-tag"><span>${moodObj.emoji}</span>${moodObj.label}</div>
+        <div class="card-text">${escapeHtml(m.text)}</div>
+        <div class="card-actions">
+          <button class="action ${isLiked ? "liked" : ""}" onclick="toggleLike('${m.id}')">${isLiked ? "♥" : "♡"} ${m.likes}</button>
+          <button class="action" onclick="copyMsg('${m.id}')">⎙ Copy</button>
+        </div>
+      </div>
+    `;
+  }).join("");
+}
+
+function escapeHtml(s) {
+  return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+}
+
+window.toggleLike = (id) => {
+  const msg = messages.find((m) => m.id === id);
+  if (!msg) return;
+  if (liked.has(id)) {
+    liked.delete(id);
+    msg.likes = Math.max(0, msg.likes - 1);
+  } else {
+    liked.add(id);
+    msg.likes++;
+  }
+  save();
+  renderFeed();
+};
+
+window.copyMsg = async (id) => {
+  const msg = messages.find((m) => m.id === id);
+  if (!msg) return;
+  try {
+    await navigator.clipboard.writeText(msg.text);
+    toast("Copied to clipboard");
+  } catch {
+    toast("Copy: " + msg.text.slice(0, 40));
+  }
+};
+
+function toast(t) {
+  const el = $("#toast");
+  el.textContent = t;
+  el.classList.add("show");
+  setTimeout(() => { el.classList.remove("show"); }, 2400);
+}
+
+function updateChar() {
+  const len = msgInput.value.length;
+  charCount.textContent = `${len} / 500`;
+  postBtn.disabled = len === 0 || len > 500;
+}
+
+msgInput.addEventListener("input", updateChar);
+msgInput.addEventListener("focus", () => { $("#writeCard").style.transform = "translateY(-2px)"; });
+msgInput.addEventListener("blur", () => { $("#writeCard").style.transform = ""; });
+
+postBtn.addEventListener("click", () => {
+  const text = msgInput.value.trim();
+  if (!text || text.length > 500) return;
+  const newMsg = {
+    id: Math.random().toString(36).slice(2, 9),
+    text,
+    mood: currentMood,
+    timestamp: Date.now(),
+    likes: 0,
+    anonId: `anon#${Math.floor(1000 + Math.random() * 9000)}`,
+    gradient: Math.floor(Math.random() * GRADIENTS.length)
+  };
+  messages.unshift(newMsg);
+  save();
+  msgInput.value = "";
+  updateChar();
+  renderFeed();
+  toast("Message stored forever — anonymously.");
+  $("#previewId").textContent = newMsg.anonId;
+});
+
+searchInput.addEventListener("input", (e) => {
+  searchQ = e.target.value;
+  renderFeed();
+});
+
+function initPreview() {
+  $("#previewAvatar").style.background = GRADIENTS[Math.floor(Math.random() * GRADIENTS.length)];
+  $("#previewId").textContent = `anon#${Math.floor(1000 + Math.random() * 9000)}`;
+  $("#onlineCount").textContent = 120 + Math.floor(Math.random() * 80);
+}
+
+$("#infoBtn").addEventListener("click", () => { $("#infoModal").classList.remove("hidden"); });
+$("#closeModal").addEventListener("click", () => { $("#infoModal").classList.add("hidden"); });
+$("#modalBg").addEventListener("click", () => { $("#infoModal").classList.add("hidden"); });
+$("#gotIt").addEventListener("click", () => { $("#infoModal").classList.add("hidden"); });
+
+load();
+initPreview();
+renderMoods();
+renderFilters();
+updateChar();
+renderFeed();
+setInterval(renderFeed, 30000);
+</script>
+
+</body>
+</html>
