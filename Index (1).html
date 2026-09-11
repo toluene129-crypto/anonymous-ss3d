@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>SS3D — Anonymous Messages</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&family=JetBrains+Mono:wght@400;600&display=swap"
+        rel="stylesheet"
+    >
+
+    <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+
+    <div class="bg-orbs">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="orb orb-3"></div>
+    </div>
+
+    <!-- HEADER -->
+    <header class="header">
+        <div class="container header-inner">
+
+            <div class="logo">
+
+                <div class="logo-mark">SS3D</div>
+
+                <div class="logo-text">
+                    <span class="logo-title">ANONYMOUS</span>
+                    <span class="logo-sub">MESSAGES • FOREVER</span>
+                </div>
+
+            </div>
+
+            <div class="header-right">
+
+                <div class="online-dot">
+                    <span class="dot"></span>
+                    <span id="onlineCount">184</span> anon online
+                </div>
+
+                <button class="btn-ghost" id="infoBtn">
+                    Instruction
+                </button>
+
+            </div>
+
+        </div>
+    </header>
+
+
+    <!-- HERO + WRITE -->
+    <main class="container main">
+
+        <section class="hero-grid">
+
+            <!-- Left: intro -->
+            <div class="hero-copy">
+
+                <div class="badge">
+                    PURE HTML / CSS / JS — GITHUB READY
+                </div>
+
+                <h1>
+                    Say it without saying
+                    <span class="grad">who you are.</span>
+                </h1>
+
+                <p class="hero-desc">
+                    Anonymous messages stored forever. No names. No logs.
+                    No accounts. Just whispers from the SS3D community
+                    that live on.
+                </p>
+
+                <div class="stats">
+
+                    <div class="stat">
+                        <span class="stat-num" id="totalMessages">0</span>
+                        <span class="stat-label">whispers</span>
+                    </div>
+
+                    <div class="stat">
+                        <span class="stat-num" id="totalLikes">0</span>
+                        <span class="stat-label">hearts</span>
+                    </div>
+
+                    <div class="stat">
+                        <span class="stat-num">∞</span>
+                        <span class="stat-label">forever</span>
+                    </div>
+
+                </div>
+
+                <div class="search-wrap">
+
+                    <input
+                        type="text"
+                        id="searchInput"
+                        placeholder="Search whispers, mood, anon ID..."
+                    />
+
+                    <span class="search-icon">⌕</span>
+
+                </div>
+
+                <div class="filter-row" id="filterRow">
+
+                    <button data-mood="all" class="filter active">
+                        All
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <!-- Right: write box -->
+            <div class="write-card" id="writeCard">
+
+                <div class="write-head">
+
+                    <div class="anon-preview">
+
+                        <div class="avatar" id="previewAvatar"></div>
+
+                        <span id="previewId">
+                            anon#????
+                        </span>
+
+                    </div>
+
+                    <span class="write-hint">
+                        100% anonymous
+                    </span>
+
+                </div>
+
+                <textarea
+                    id="messageInput"
+                    maxlength="500"
+                    placeholder="What's on your mind? It's 100% anonymous..."
+                ></textarea>
+
+                <div class="write-foot">
+
+                    <div class="moods" id="moodSelector"></div>
+
+                    <div class="char-row">
+
+                        <span id="charCount">
+                            0 / 500
+                        </span>
+
+                        <button id="postBtn" class="btn-primary">
+                            Post Anonymously →
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- FEED -->
+        <section class="feed-section">
+
+            <div class="feed-head">
+
+                <h2>Live feed</h2>
+
+                <span class="feed-hint">
+                    Newest first • stored in this browser forever
+                </span>
+
+            </div>
+
+            <div class="feed" id="feed"></div>
+
+            <div class="end-marker">
+                — end of whispers — for now
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <footer class="footer">
+
+        <span>
+            Built for SS3D • By Toluene • 100% Anonymous
+        </span>
+
+        <span class="footer-right">
+            no cookies • no tracking • pure html/css/js
+        </span>
+
+    </footer>
+
+
+    <!-- TOAST -->
+    <div id="toast" class="toast"></div>
+
+
+    <!-- MODAL -->
+    <div id="infoModal" class="modal hidden">
+
+        <div class="modal-bg" id="modalBg"></div>
+
+        <div class="modal-card">
+
+            <div class="modal-top">
+
+                <div>
+
+                    <div class="mono-label">
+                        INSTRUCTION
+                    </div>
+
+                    <h3>
+                        Send ANONYMOUS messages without your name
+                    </h3>
+
+                </div>
+
+                <button id="closeModal" class="close-btn">
+                    ✕
+                </button>
+
+            </div>
+
+
+            <ol class="steps">
+
+                <li>
+                    <b>1. Open the message box</b>
+                    — Enter the anonymous message you want to send
+                </li>
+
+                <li>
+                    <b>2. Don't enter your name</b>
+                    — Your name is not required. You can send the message
+                    completely anonymously
+                </li>
+
+                <li>
+                    <b>3. Write your message</b>
+                    — Type anything you want to say, such as a compliment,
+                    confession, question, advice, or secret
+                </li>
+
+                <li>
+                    <b>4. Send anonymously</b>
+                    — Click <code>Post Anonymously</code> and your message
+                    will be submitted without displaying your name
+                </li>
+
+                <li>
+                    <b>5. Read messages</b>
+                    — The receiver can view the messages they receive,
+                    but the sender's name is not shown
+                </li>
+
+            </ol>
+
+
+            <div class="code-note">
+
+                <!--
+                <div class="code-title">
+                    // Anonymous message system
+                </div>
+
+                <pre>
+Message format:
+
+{
+    id,
+    text,
+    timestamp,
+    anonId
+}
+
+→ No name is required
+→ Messages are displayed anonymously
+→ Senders remain unnamed
+→ Users can write messages without creating an account
+
+Storage:
+
+localStorage key: 'anonymous_messages_v1'
+
+→ Good for testing and single-device use
+→ Messages are stored in the browser
+
+For a real website where messages can be
+sent and received across different devices:
+
+1. Create a Supabase / Firebase project
+
+2. Store messages in a database
+
+3. Use the same message structure:
+
+{
+    id,
+    text,
+    timestamp,
+    anonId
+}
+
+4. Never display the sender's name publicly
+                </pre>
+                -->
+
+            </div>
+
+
+            <button class="btn-primary full" id="gotIt">
+                Got it
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <script src="script.js"></script>
+
+</body>
+
+</html>
